@@ -1,0 +1,310 @@
+---
+title: "Proyecto Final Exploración de Datos"
+output: html_document
+date: "2025-11-30"
+---
+
+# Libreias utilizadas
+```{r}
+library(dplyr)
+```
+
+
+
+# Explicacion del dataset 
+
+El dataset de Product Sales Region contiene información detallada sobre ventas de productos realizadas en diferentes regiones de Estados Unidos, tiendas, y canales de pago.   Incluye tanto datos transaccionales como cantidades, precios y descuentos como información logística (fechas de envío/entrega) y datos del cliente.
+
+# Diccionario de Variables 
+
+| **Variable**     | **Descripción** |
+|------------------|------------------|
+| **Date**         | Fecha en la que se registró la venta. |
+| **Region**       | Región donde se realizó la venta (East, West, South, Central, etc.). |
+| **Product**      | Tipo de producto vendido . |
+| **Quantity**     | Cantidad de unidades vendidas. |
+| **UnitPrice**    | Precio unitario del producto. |
+| **StoreLocation** | Ubicación o tienda donde se realizó la venta. |
+| **CustomerType** | Tipo de cliente: *Retail* (Minorista) o *Wholesale* (Mayorista). |
+| **Discount**     | Porcentaje de descuento aplicado. |
+| **Salesperson**  | Nombre del vendedor encargado. |
+| **TotalPrice**   | Precio total de la venta después de aplicar el descuento. |
+| **PaymentMethod** | Método de pago utilizado. |
+| **Promotion**    | Promoción aplicada en la compra. |
+| **Returned**     | Indica si el producto fue devuelto: 1 = sí, 0 = no. |
+| **OrderID**      | Número único asignado a cada orden. |
+| **CustomerName** | Identificador o nombre del cliente. |
+| **ShippingCost** | Costo del envío asociado a la orden. |
+| **OrderDate**    | Fecha en la que se generó la orden. |
+| **DeliveryDate** | Fecha en la que se entregó el pedido. |
+| **RegionManager** | Nombre del gerente responsable de la región correspondiente. |
+
+
+
+
+# Lectura del dataset 
+```{r}
+DatosProyecto <- read.csv("C:\\Users\\Roberto\\OneDrive\\Documents\\Product-Sales-Region.csv")
+```
+
+
+# Estadisticas basicas 
+
+# Head
+
+```{r}
+head(DatosProyecto)
+```
+
+
+# Tail 
+```{r}
+tail(DatosProyecto)
+```
+
+# Str 
+```{r}
+str(DatosProyecto)
+```
+
+
+Summary 
+```{r}
+summary(DatosProyecto)
+```
+
+# Tipos de datos de las variables 
+```{r}
+class(DatosProyecto$Date)
+```
+```{r}
+class(DatosProyecto$Region)
+```
+
+```{r}
+class(DatosProyecto$Product)
+```
+
+```{r}
+class(DatosProyecto$Quantity)
+```
+
+```{r}
+class(DatosProyecto$UnitPrice)
+```
+
+```{r}
+class(DatosProyecto$StoreLocation)
+```
+
+```{r}
+class(DatosProyecto$CustomerType)
+```
+
+```{r}
+class(DatosProyecto$Discount)
+```
+
+```{r}
+class(DatosProyecto$Salesperson)
+```
+
+```{r}
+class(DatosProyecto$TotalPrice)
+```
+
+```{r}
+class(DatosProyecto$PaymentMethod)
+```
+
+```{r}
+class(DatosProyecto$Promotion)
+```
+
+```{r}
+class(DatosProyecto$Returned)
+```
+
+```{r}
+class(DatosProyecto$OrderID)
+```
+
+```{r}
+class(DatosProyecto$CustomerName)
+```
+
+```{r}
+class(DatosProyecto$ShippingCost)
+```
+
+```{r}
+class(DatosProyecto$OrderDate)
+```
+
+```{r}
+class(DatosProyecto$DeliveryDate)
+```
+
+```{r}
+class(DatosProyecto$RegionManager)
+```
+
+# Limpieza de datos y justificación
+En esta sección se realiza un proceso completo de limpieza y preparación del dataset, con el objetivo de asegurar que los datos estén en el formato adecuado para realizar un análisis exploratorio confiable y obtener conclusiones válidas.   Cada transformación aplicada responde a una buena práctica utilizada en análisis de datos, ciencia de datos y modelado estadístico.
+
+
+# Conversión de Fechas 
+```{r}
+DatosProyecto <- DatosProyecto %>%
+  mutate(
+    Date = as.Date(Date),
+    OrderDate = as.Date(OrderDate),
+    DeliveryDate = as.Date(DeliveryDate)
+  )
+```
+Variables como Date, OrderDate y DeliveryDate representan momentos específicos en el tiempo, por lo que se convierten al tipo Date. 
+ 
+
+# Conversión Numerica 
+```{r}
+DatosProyecto <- DatosProyecto %>%
+  mutate(
+    Quantity = as.numeric(Quantity),
+    UnitPrice = as.numeric(UnitPrice),
+    Discount = as.numeric(Discount),
+    TotalPrice = as.numeric(TotalPrice),
+    ShippingCost = as.numeric(ShippingCost)
+  )
+```
+
+2. Conversión de Variables Numéricas
+
+Columnas como:
+
+Quantity
+
+UnitPrice
+
+Discount
+
+TotalPrice
+
+ShippingCost
+
+Se convierten a numeric porque si se dejan como texto, impedirían cualquier análisis matemático.
+
+# Conversión Booleana 
+```{r}
+DatosProyecto <- DatosProyecto %>%
+  mutate(
+    Returned = Returned == 1
+  )
+```
+La variable Returned se transforma a TRUE/FALSE, ya que representa una condición binaria:
+
+TRUE = el producto fue devuelto
+
+FALSE = no fue devuelto
+
+# Coversion Categorica 
+```{r}
+DatosProyecto <- DatosProyecto %>%
+  mutate(
+    Region = as.factor(Region),
+    Product = as.factor(Product),
+    StoreLocation = as.factor(StoreLocation),
+    CustomerType = as.factor(CustomerType),
+    Salesperson = as.factor(Salesperson),
+    PaymentMethod = as.factor(PaymentMethod),
+    Promotion = as.factor(Promotion),
+    RegionManager = as.factor(RegionManager)
+  )
+```
+
+Variables como:
+
+RegiOn
+
+Product
+
+StoreLocation
+
+CustomerType 
+
+SalesPerson
+
+PaymentMethod
+
+Promtion 
+
+Region Manager 
+
+Son categorías, no números convertirlas a factor permite R nterprete estas variables como grupos, no como valores numéricos.
+
+# Conversión a Character 
+```{r}
+DatosProyecto <- DatosProyecto %>%
+  mutate(
+    OrderID = as.character(OrderID),
+    CustomerName = as.character(CustomerName)
+  )
+```
+
+Conversión de Identificadores a Character
+
+Variables como:
+
+OrderID
+
+CustomerName
+
+no deben ser numéricas, porque:
+
+No representan cantidades
+
+No deben ser sumadas ni promediadas
+
+Su valor numérico no tiene significado estadístico
+
+Por eso se pasan a character para evitar interpretaciones incorrectas
+
+# Eliminar duplicados
+```{r}
+DatosLimpios <- DatosProyecto %>%
+  distinct(OrderID, .keep_all = TRUE)
+```
+
+Se elimina cualquier registro con el mismo OrderID usando el chunk de arriba 
+Esto es fundamental porque:
+
+Cada orden debe ser única
+
+Los duplicados distorsionan ventas totales
+
+Alteran promedios, conteos y tendencias
+
+Generan errores en análisis de desempeño por producto, región o vendedor
+
+Eliminar duplicados garantiza integridad y calidad en el dataset.
+
+
+```{r}
+
+```
+
+```{r}
+head(DatosLimpios)
+```
+
+```{r}
+tail(DatosLimpios)
+```
+
+```{r}
+str(DatosLimpios)
+```
+
+```{r}
+summary(DatosLimpios)
+```
+
