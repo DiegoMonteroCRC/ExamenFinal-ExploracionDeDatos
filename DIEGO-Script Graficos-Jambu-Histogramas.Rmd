@@ -1,0 +1,201 @@
+---
+title: "Proyecto final-Exploracion de Datos"
+author: "Luis Diego Montero Vargas"
+date: "2025-12-03"
+output: html_document
+---
+
+```{r}
+datos<- read.csv("Product-Sales-Region.csv")
+```
+
+# Librerias
+```{r}
+library(ggplot2)
+library(reshape2)
+```
+
+
+# Dendograma
+
+1. Primero se crea un dataframe que contenga las variables numericas del dataset completo
+
+```{r}
+df_numerico <- datos[ , sapply(datos, is.numeric)]
+```
+
+2. Posteriormente se eliminan las filas de datos que contengan valor NA. 
+
+Este paso se hace simplemente por validación ya que en este escenario no existen valores NA
+
+```{r}
+df_numerico <- na.omit(df_num)
+```
+
+3. Posteriormente se escalan los datos para que todas la variables tengan el mismo peso ya que los valores entre varibales son muy distintos entre ellos y eso nos puede generar problemas en el resultado
+
+```{r}
+df_scalado <- scale(df_numerico)
+```
+
+4. Se realiza la matriz de distancias para el endograma
+
+```{r}
+dist_matrix <- dist(df_scaled, method = "euclidean")
+```
+
+5. Se crea el cluster gerarquico
+
+```{r}
+cluster_ger <- hclust(dist_matrix, method = "complete")
+```
+
+6. Generar la vista
+
+```{r}
+plot(cluster_ger,
+     main = "Dendrograma de Clustering Jerárquico",
+     xlab = "Observaciones",
+     ylab = "Distancia entre grupos",
+     sub = "",
+     cex = 0.5)
+```
+Como podemos observar las agrupaciones demasiadas y poco visibles debido a la gran cantidad de datos que estamos tomando. Para efectos de una mejor vista se va a tomar una muestra de al menos 400 datos para entender mejor las agrupaciones que existen en el dataset
+
+### Visualizar muestra de Endograma
+
+Se toma una muestra de al menos uno 100 observaciones para una mejor visualización
+
+```{r}
+sub_muestra <- datos[sample(1:nrow(datos), 150), ]
+```
+
+Se toman solo variables numéricas
+```{r}
+num_vars <- sub_muestra[ , sapply(sub_muestra, is.numeric)]
+```
+
+Eliminar filas NA
+```{r}
+num_vars <- na.omit(num_vars)
+```
+
+Escalar los datos
+```{r}
+scaled_vars <- scale(num_vars)
+```
+
+Generar matriz de distancias
+```{r}
+distancias <- dist(scaled_vars, method = "euclidean")
+```
+
+Generar cluster gerarquico
+```{r}
+cluster_h <- hclust(distancias, method = "complete")
+```
+
+Visualización de datos
+```{r}
+plot(
+  cluster_h,
+  main = "Dendrograma con muestra de 150 observaciones",
+  xlab = "Observaciones",
+  ylab = "Distancia entre grupos",
+  sub = "",
+  cex = 0.5
+)
+```
+
+## Conclusión dendograma
+
+Como sabemos, los dendrogramas permiten identificar la similitud entre las observaciones del dataset.
+En el dendrograma completo del incio se observa una estructura muy densa debido al alto volumen de datos, lo cual es normal y dificulta la interpretación visual.
+En cambio, el dendrograma generado con una muestra de 150 registros muestra grupos mejor definidos, permitiendo ver con mayor claridad cómo se forman los clusters según sus características.
+En ambos casos se aprecia que existen patrones de similitud entre los registros, confirmando que el dataset posee tendencias que pueden ser agrupadas.
+
+
+
+# Codigo Jambu
+
+```{r}
+# --- 1. Seleccionar variables numéricas ---
+num_vars_jambu <- datos[ , sapply(datos, is.numeric)]
+num_vars_jambu <- na.omit(num_vars_jambu)
+
+# --- 2. Escalar ---
+scaled_jambu <- scale(num_vars_jambu)
+
+# --- 3. Matriz de correlación ---
+cor_mat <- cor(scaled_jambu)
+
+# --- 4. Pesos de Jambú ---
+pesos_jambu <- colSums(abs(cor_mat))
+
+# --- 5. Tabla ordenada ---
+tabla_jambu <- sort(pesos_jambu, decreasing = TRUE)
+
+# Mostrar tabla
+tabla_jambu
+```
+
+```{r}
+barplot(
+  tabla_jambu,
+  main = "Importancia de Variables según Código Jambú",
+  xlab = "Variables",
+  ylab = "Peso (suma de correlaciones absolutas)",
+  col = "gray",
+  las = 2
+)
+```
+
+
+
+# Correlaciones
+
+Para generar las correlaciones vamos a realizar los siguientes pasos
+
+1. Selección de variables numéricas del dataset y eliminar valores NA
+```{r}
+valores_corr <- datos[ , sapply(datos, is.numeric)]
+valores_corr <- na.omit(num_corr)
+```
+
+2. Se crea la matriz de correlacion
+```{r}
+matriz_corr <- cor(valores_corr)
+```
+
+3. Conversión de matriz cuadrada a formato largo
+```{r}
+corr_long <- melt(cor_mat)
+```
+
+4. Visualización
+```{r}
+ggplot(corr_long, aes(Var1, Var2, fill = value))+
+  geom_tile(color='white')+
+  geom_text(aes(label = round(value, 2)), size=3)+
+  scale_fill_gradient2(
+    low = "blue",
+    mid = "white",
+    high = "red",
+    midpoint = 0,
+    limits = c(-1,1),
+    name = "Correlación"
+  )+ 
+ labs(
+    title = "Mapa de Calor de Correlaciones (-1 a 1)",
+    x = "Variables",
+    y = "Variables"
+  )+
+  theme_minimal()
+```
+
+
+
+
+
+
+
